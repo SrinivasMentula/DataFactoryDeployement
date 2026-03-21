@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "MetaDataInformation",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -37,7 +37,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "MetaDataInformation",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -46,92 +46,11 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('MetaDataInformation').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
-						{
-							"name": "Execute Pipeline1",
-							"type": "ExecutePipeline",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
-							"dependsOn": [
-								{
-									"activity": "If Condition1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "pl_innderChildPipelineDataLoad",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"schemaName": {
-										"value": "@item().schemName",
-										"type": "Expression"
-									},
-									"containerName": {
-										"value": "@item().containername",
-										"type": "Expression"
-									},
-									"loadType": "@item().loadType",
-									"tableNames": {
-										"value": "@item().table_names",
-										"type": "Expression"
-									},
-									"LastUpdatevalue": {
-										"value": "@item().table_names",
-										"type": "Expression"
-									}
-								}
-							}
-						},
-						{
-							"name": "If Condition1",
-							"type": "IfCondition",
-							"dependsOn": [
-								{
-									"activity": "Set variable1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"expression": {
-									"value": "@equals(item().loadType,'FullLoad' )",
-									"type": "Expression"
-								},
-								"ifTrueActivities": [
-									{
-										"name": "Execute Pipeline2",
-										"type": "ExecutePipeline",
-										"dependsOn": [],
-										"policy": {
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"pipeline": {
-												"referenceName": "pl_TrunacteAndLoad",
-												"type": "PipelineReference"
-											},
-											"waitOnCompletion": true
-										}
-									}
-								]
-							}
-						},
 						{
 							"name": "shemaNames",
 							"type": "SetVariable",
@@ -174,7 +93,7 @@
 							}
 						},
 						{
-							"name": "Set variable1",
+							"name": "tableNames",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
@@ -194,6 +113,43 @@
 								"value": {
 									"value": "@item().table_names",
 									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "fullLoadPipeline",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "tableNames",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_fullLoad",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"tableNames": {
+										"value": "@split(variables('tableName'),',')",
+										"type": "Expression"
+									},
+									"containerName": {
+										"value": "@variables('containerName')",
+										"type": "Expression"
+									},
+									"schemaName": {
+										"value": "@variables('schemaName')",
+										"type": "Expression"
+									}
 								}
 							}
 						}
