@@ -47,9 +47,16 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Lookup1",
+						"name": "MetaDataInformation",
 						"type": "Lookup",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Get Metadata1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -81,7 +88,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Lookup1",
+								"activity": "MetaDataInformation",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -90,13 +97,13 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Lookup1').output.value",
+								"value": "@activity('MetaDataInformation').output.value",
 								"type": "Expression"
 							},
 							"isSequential": true,
 							"activities": [
 								{
-									"name": "loadType",
+									"name": "shemaNames",
 									"type": "SetVariable",
 									"dependsOn": [],
 									"policy": {
@@ -105,9 +112,9 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"variableName": "loadType",
+										"variableName": "schemaName",
 										"value": {
-											"value": "@item().loadType",
+											"value": "@item().schemaNameDummy",
 											"type": "Expression"
 										}
 									}
@@ -117,7 +124,7 @@
 									"type": "SetVariable",
 									"dependsOn": [
 										{
-											"activity": "loadType",
+											"activity": "shemaNames",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -137,35 +144,11 @@
 									}
 								},
 								{
-									"name": "schemaName",
+									"name": "tableNames",
 									"type": "SetVariable",
 									"dependsOn": [
 										{
 											"activity": "containerName",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "schemaName",
-										"value": {
-											"value": "@item().schemName",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "table_names",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "schemaName",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -185,11 +168,62 @@
 									}
 								},
 								{
-									"name": "lastModified",
+									"name": "If Condition1",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "lastUpdateValue",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@equals(item().loadType,'FullLoad' )",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "fullLoadPipeline",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "pl_fullLoad",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"tableNames": {
+															"value": "@split(variables('tableName'),',')",
+															"type": "Expression"
+														},
+														"containerName": {
+															"value": "@variables('containerName')",
+															"type": "Expression"
+														},
+														"schemaName": {
+															"value": "@variables('schemaName')",
+															"type": "Expression"
+														}
+													}
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "lastUpdateValue",
 									"type": "SetVariable",
 									"dependsOn": [
 										{
-											"activity": "table_names",
+											"activity": "tableNames",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -207,53 +241,44 @@
 											"type": "Expression"
 										}
 									}
-								},
-								{
-									"name": "Execute Pipeline1",
-									"type": "ExecutePipeline",
-									"dependsOn": [
-										{
-											"activity": "lastModified",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pl_innderChildPipelineDataLoad",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"schemaName": {
-												"value": "@variables('schemaName')",
-												"type": "Expression"
-											},
-											"containerName": {
-												"value": "@variables('containerName')",
-												"type": "Expression"
-											},
-											"loadType": {
-												"value": "@variables('loadType')",
-												"type": "Expression"
-											},
-											"tableNames": {
-												"value": "@variables('tableName')",
-												"type": "Expression"
-											},
-											"LastUpdatevalue": {
-												"value": "@variables('lastUpdateValue')",
-												"type": "Expression"
-											}
-										}
-									}
 								}
 							]
+						}
+					},
+					{
+						"name": "Get Metadata1",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "ds_ChildItems",
+								"type": "DatasetReference",
+								"parameters": {
+									"containerName": {
+										"value": "@variables('containerName')",
+										"type": "Expression"
+									}
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobStorageReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
 						}
 					}
 				],
@@ -268,12 +293,19 @@
 						"type": "String"
 					},
 					"containerName": {
-						"type": "String"
+						"type": "String",
+						"defaultValue": "hospitalone"
 					},
 					"lastUpdateValue": {
 						"type": "String"
 					},
 					"tableName": {
+						"type": "String"
+					},
+					"validationFlag": {
+						"type": "String"
+					},
+					"ADFURl": {
 						"type": "String"
 					}
 				},
@@ -282,7 +314,174 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_sqlDatabase')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_innderChildPipelineDataLoad')]"
+				"[concat(variables('factoryId'), '/datasets/ds_ChildItems')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_fullLoad')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_fullLoad')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.tableNames",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 5,
+							"activities": [
+								{
+									"name": "Copy data1",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": true,
+												"wildcardFileName": {
+													"value": "@concat(item(),'*.csv')",
+													"type": "Expression"
+												},
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "Truncate  table \n @{concat(pipeline().parameters.schemaName,'.',item())}",
+												"type": "Expression"
+											},
+											"writeBehavior": "insert",
+											"sqlWriterUseTableLock": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_dimHopsitalSource",
+											"type": "DatasetReference",
+											"parameters": {
+												"containerName": {
+													"value": "@pipeline().parameters.containerName",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_sqlDatabase",
+											"type": "DatasetReference",
+											"parameters": {
+												"databasename": "sqlDatabaseLearnMentula",
+												"table_name": {
+													"value": "@item()",
+													"type": "Expression"
+												},
+												"schemaName": {
+													"value": "@pipeline().parameters.schemaName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"name": "updatingTheMetadata",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "ForEach1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "ls_azuresqldatbase",
+							"type": "LinkedServiceReference",
+							"parameters": {
+								"datbaseName": "sqlDatabaseLearnMentula"
+							}
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "update dbo.metadata\nset loadType = 'Incremental',\n    lastUpdated = getdate()\nwhere schemaName = '@{pipeline().parameters.schemaName}'\n",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"tableNames": {
+						"type": "array",
+						"defaultValue": [
+							"departments",
+							"patients'"
+						]
+					},
+					"containerName": {
+						"type": "string"
+					},
+					"schemaName": {
+						"type": "string",
+						"defaultValue": "hospitalOne"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_azuresqldatbase')]",
+				"[concat(variables('factoryId'), '/datasets/ds_dimHopsitalSource')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sqlDatabase')]"
 			]
 		},
 		{
@@ -313,7 +512,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "tableNamesInArray",
+								"activity": "If Condition2",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -332,7 +531,7 @@
 									"type": "IfCondition",
 									"dependsOn": [
 										{
-											"activity": "containername",
+											"activity": "Set variable1",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -441,32 +640,27 @@
 											"type": "Expression"
 										}
 									}
-								},
-								{
-									"name": "containername",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Set variable1",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "containerNameInForLoop",
-										"value": {
-											"value": "@pipeline().parameters.containerName",
-											"type": "Expression"
-										}
-									}
 								}
 							]
+						}
+					},
+					{
+						"name": "If Condition2",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "tableNamesInArray",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(pipeline().parameters.loadType,'FullLoad')",
+								"type": "Expression"
+							}
 						}
 					}
 				],
@@ -512,6 +706,41 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_dimHopsitalSource')]",
 				"[concat(variables('factoryId'), '/datasets/ds_sqlDatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ChildItems')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_storageAccount",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"containerName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": {
+							"value": "@dataset().containerName",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": false,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_storageAccount')]"
 			]
 		},
 		{
