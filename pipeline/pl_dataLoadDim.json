@@ -5,7 +5,16 @@
 			{
 				"name": "MetaDataInformation",
 				"type": "Lookup",
-				"dependsOn": [],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -63,7 +72,7 @@
 							"typeProperties": {
 								"variableName": "schemaName",
 								"value": {
-									"value": "@item().schemaName",
+									"value": "@item().schemaNameDummy",
 									"type": "Expression"
 								}
 							}
@@ -117,8 +126,59 @@
 							}
 						},
 						{
-							"name": "fullLoadPipeline",
-							"type": "ExecutePipeline",
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "lastUpdateValue",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(item().loadType,'FullLoad' )",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "fullLoadPipeline",
+										"type": "ExecutePipeline",
+										"dependsOn": [],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "pl_fullLoad",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"tableNames": {
+													"value": "@split(variables('tableName'),',')",
+													"type": "Expression"
+												},
+												"containerName": {
+													"value": "@variables('containerName')",
+													"type": "Expression"
+												},
+												"schemaName": {
+													"value": "@variables('schemaName')",
+													"type": "Expression"
+												}
+											}
+										}
+									}
+								]
+							}
+						},
+						{
+							"name": "lastUpdateValue",
+							"type": "SetVariable",
 							"dependsOn": [
 								{
 									"activity": "tableNames",
@@ -128,32 +188,54 @@
 								}
 							],
 							"policy": {
+								"secureOutput": false,
 								"secureInput": false
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "pl_fullLoad",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"tableNames": {
-										"value": "@split(variables('tableName'),',')",
-										"type": "Expression"
-									},
-									"containerName": {
-										"value": "@variables('containerName')",
-										"type": "Expression"
-									},
-									"schemaName": {
-										"value": "@variables('schemaName')",
-										"type": "Expression"
-									}
+								"variableName": "lastUpdateValue",
+								"value": {
+									"value": "@item().lastUpdated",
+									"type": "Expression"
 								}
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_ChildItems",
+						"type": "DatasetReference",
+						"parameters": {
+							"containerName": {
+								"value": "@variables('containerName')",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
 				}
 			}
 		],
@@ -165,12 +247,19 @@
 				"type": "String"
 			},
 			"containerName": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "hospitalone"
 			},
 			"lastUpdateValue": {
 				"type": "String"
 			},
 			"tableName": {
+				"type": "String"
+			},
+			"validationFlag": {
+				"type": "String"
+			},
+			"ADFURl": {
 				"type": "String"
 			}
 		},
