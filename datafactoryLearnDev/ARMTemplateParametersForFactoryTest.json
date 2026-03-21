@@ -1,1 +1,30 @@
-this iwll have the paamters datac
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "datafactoryLearnDev"
+		},
+		"ls_azuresqldatbase_properties_typeProperties_server": {
+			"value": "sqlserverlearndev.database.windows.net"
+		},
+		"ls_azuresqldatbase_properties_typeProperties_database": {
+			"value": "@{linkedService().datbaseName}"
+		},
+		"ls_azuresqldatbase_properties_typeProperties_userName": {
+			"value": "MentulaSrinivas"
+		},
+		"ls_keyvault_properties_typeProperties_baseUrl": {
+			"value": "https://learnkeyvaultmenthula.vault.azure.net/"
+		},
+		"ls_storageAccount_properties_typeProperties_serviceEndpoint": {
+			"value": "https://learndatabricksazure.blob.core.windows.net/"
+		},
+		"ls_storageAccount_properties_typeProperties_tenant": {
+			"value": "675380b9-575c-43fc-a696-a5f3809b55be"
+		},
+		"ls_storageAccount_properties_typeProperties_servicePrincipalId": {
+			"value": "722d4b82-a332-4fbb-98dd-c2d9dca1b3c5"
+		}
+	}
+}
