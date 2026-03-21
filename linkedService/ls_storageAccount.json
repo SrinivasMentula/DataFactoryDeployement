@@ -1,0 +1,23 @@
+{
+	"name": "ls_storageAccount",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://learndatabricksazure.blob.core.windows.net/",
+			"tenant": "675380b9-575c-43fc-a696-a5f3809b55be",
+			"servicePrincipalId": "722d4b82-a332-4fbb-98dd-c2d9dca1b3c5",
+			"servicePrincipalCredentialType": "ServicePrincipalKey",
+			"servicePrincipalCredential": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_keyvault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "ServicePrinciaplClinetSecret"
+			},
+			"accountKind": "StorageV2"
+		}
+	}
+}

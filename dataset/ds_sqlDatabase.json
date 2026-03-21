@@ -1,0 +1,75 @@
+{
+	"name": "ds_sqlDatabase",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azuresqldatbase",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"datbaseName": {
+					"value": "@dataset().databasename",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"databasename": {
+				"type": "string",
+				"defaultValue": "sqlDatabaseLearnMentula"
+			},
+			"table_name": {
+				"type": "string",
+				"defaultValue": "metadata"
+			},
+			"schemaName": {
+				"type": "string",
+				"defaultValue": "dbo"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "SNO",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "datbaseName",
+				"type": "varchar"
+			},
+			{
+				"name": "schemName",
+				"type": "varchar"
+			},
+			{
+				"name": "containername",
+				"type": "varchar"
+			},
+			{
+				"name": "table_names",
+				"type": "varchar"
+			},
+			{
+				"name": "loadType",
+				"type": "varchar"
+			},
+			{
+				"name": "lastUpdated",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().schemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().table_name",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

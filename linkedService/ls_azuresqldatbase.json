@@ -1,0 +1,30 @@
+{
+	"name": "ls_azuresqldatbase",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"datbaseName": {
+				"type": "String",
+				"defaultValue": "sqlDatabaseLearnMentula"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "sqlserverlearndev.database.windows.net",
+			"database": "@{linkedService().datbaseName}",
+			"encrypt": "mandatory",
+			"trustServerCertificate": true,
+			"authenticationType": "SQL",
+			"userName": "MentulaSrinivas",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_keyvault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "sqldatbasePassword"
+			}
+		}
+	}
+}

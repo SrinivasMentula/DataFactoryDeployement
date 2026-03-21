@@ -1,0 +1,221 @@
+{
+	"name": "pl_innderChildPipelineDataLoad",
+	"properties": {
+		"activities": [
+			{
+				"name": "tableNamesInArray",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "tableNamesArray",
+					"value": {
+						"value": "@split(pipeline().parameters.tableNames,',' )",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "tableNamesInArray",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('tableNamesArray')",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "containername",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(pipeline().parameters.loadType,'FullLoad' )",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Copy data1",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"storeSettings": {
+													"type": "AzureBlobStorageReadSettings",
+													"recursive": true,
+													"wildcardFileName": {
+														"value": "@concat(variables('tableNameInForLoop'),'*.csv')",
+														"type": "Expression"
+													},
+													"enablePartitionDiscovery": false
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings"
+												}
+											},
+											"sink": {
+												"type": "AzureSqlSink",
+												"preCopyScript": {
+													"value": "TRuncate table @{concat(pipeline().parameters.schemaName,'.',variables('tableNameInForLoop'))\n}",
+													"type": "Expression"
+												},
+												"writeBehavior": "insert",
+												"sqlWriterUseTableLock": false
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "ds_dimHopsitalSource",
+												"type": "DatasetReference",
+												"parameters": {
+													"containerName": {
+														"value": "@pipeline().parameters.containerName",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_sqlDatabase",
+												"type": "DatasetReference",
+												"parameters": {
+													"databasename": "sqlDatabaseLearnMentula",
+													"table_name": {
+														"value": "@variables('tableNameInForLoop')",
+														"type": "Expression"
+													},
+													"schemaName": {
+														"value": "@pipeline().parameters.schemaName",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									}
+								]
+							}
+						},
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "tableNameInForLoop",
+								"value": {
+									"value": "@item()",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "containername",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "containerNameInForLoop",
+								"value": {
+									"value": "@pipeline().parameters.containerName",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"schemaName": {
+				"type": "string",
+				"defaultValue": "hospitalTwo"
+			},
+			"containerName": {
+				"type": "string",
+				"defaultValue": "hospitaltwo"
+			},
+			"loadType": {
+				"type": "string",
+				"defaultValue": "FullLoad"
+			},
+			"tableNames": {
+				"type": "string",
+				"defaultValue": "departments,encounters,patients,transactions"
+			},
+			"LastUpdatevalue": {
+				"type": "string",
+				"defaultValue": "2026-03-21 07:49:31.253"
+			}
+		},
+		"variables": {
+			"tableNamesArray": {
+				"type": "Array"
+			},
+			"tableNameInForLoop": {
+				"type": "String"
+			},
+			"containerNameInForLoop": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-03-21T12:11:39Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

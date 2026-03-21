@@ -1,0 +1,237 @@
+{
+	"name": "pl_dataLoadDim",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sqlDatabase",
+						"type": "DatasetReference",
+						"parameters": {
+							"databasename": "sqlDatabaseLearnMentula",
+							"table_name": "metadata",
+							"schemaName": "dbo"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup1').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "loadType",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "loadType",
+								"value": {
+									"value": "@item().loadType",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "containerName",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "loadType",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "containerName",
+								"value": {
+									"value": "@item().containername",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "schemaName",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "containerName",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "schemaName",
+								"value": {
+									"value": "@item().schemName",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "table_names",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "schemaName",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "tableName",
+								"value": {
+									"value": "@item().table_names",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "lastModified",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "table_names",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "lastUpdateValue",
+								"value": {
+									"value": "@item().lastUpdated",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "lastModified",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_innderChildPipelineDataLoad",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"schemaName": {
+										"value": "@variables('schemaName')",
+										"type": "Expression"
+									},
+									"containerName": {
+										"value": "@variables('containerName')",
+										"type": "Expression"
+									},
+									"loadType": {
+										"value": "@variables('loadType')",
+										"type": "Expression"
+									},
+									"tableNames": {
+										"value": "@variables('tableName')",
+										"type": "Expression"
+									},
+									"LastUpdatevalue": {
+										"value": "@variables('lastUpdateValue')",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"schemaName": {
+				"type": "String"
+			},
+			"loadType": {
+				"type": "String"
+			},
+			"containerName": {
+				"type": "String"
+			},
+			"lastUpdateValue": {
+				"type": "String"
+			},
+			"tableName": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-03-21T11:23:58Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
