@@ -1,0 +1,754 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "datafactoryLearnDev"
+		},
+		"ls_keyvault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://learnkeyvaultmenthula.vault.azure.net/"
+		},
+		"ls_azuresqldatbase_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sqlserverlearndev.database.windows.net"
+		},
+		"ls_azuresqldatbase_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().datbaseName}"
+		},
+		"ls_azuresqldatbase_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "MentulaSrinivas"
+		},
+		"ls_storageAccount_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://learndatabricksazure.blob.core.windows.net/"
+		},
+		"ls_storageAccount_properties_typeProperties_tenant": {
+			"type": "string",
+			"defaultValue": "675380b9-575c-43fc-a696-a5f3809b55be"
+		},
+		"ls_storageAccount_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "722d4b82-a332-4fbb-98dd-c2d9dca1b3c5"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_keyvault')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('ls_keyvault_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_azuresqldatbase')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"datbaseName": {
+						"type": "String",
+						"defaultValue": "sqlDatabaseLearnMentula"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('ls_azuresqldatbase_properties_typeProperties_server')]",
+					"database": "[parameters('ls_azuresqldatbase_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": true,
+					"authenticationType": "SQL",
+					"userName": "[parameters('ls_azuresqldatbase_properties_typeProperties_userName')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "ls_keyvault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "sqldatbasePassword"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_keyvault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_storageAccount')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"serviceEndpoint": "[parameters('ls_storageAccount_properties_typeProperties_serviceEndpoint')]",
+					"tenant": "[parameters('ls_storageAccount_properties_typeProperties_tenant')]",
+					"servicePrincipalId": "[parameters('ls_storageAccount_properties_typeProperties_servicePrincipalId')]",
+					"servicePrincipalCredentialType": "ServicePrincipalKey",
+					"servicePrincipalCredential": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "ls_keyvault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "ServicePrinciaplClinetSecret"
+					},
+					"accountKind": "StorageV2"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_keyvault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_dimHopsitalSource')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_storageAccount",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"containerName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": {
+							"value": "@dataset().containerName",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "DeptID",
+						"type": "String"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_storageAccount')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sqlDatabase')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_azuresqldatbase",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"datbaseName": {
+							"value": "@dataset().databasename",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"databasename": {
+						"type": "string",
+						"defaultValue": "sqlDatabaseLearnMentula"
+					},
+					"table_name": {
+						"type": "string",
+						"defaultValue": "metadata"
+					},
+					"schemaName": {
+						"type": "string",
+						"defaultValue": "dbo"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SNO",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "datbaseName",
+						"type": "varchar"
+					},
+					{
+						"name": "schemName",
+						"type": "varchar"
+					},
+					{
+						"name": "containername",
+						"type": "varchar"
+					},
+					{
+						"name": "table_names",
+						"type": "varchar"
+					},
+					{
+						"name": "loadType",
+						"type": "varchar"
+					},
+					{
+						"name": "lastUpdated",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().schemaName",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().table_name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_azuresqldatbase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_innderChildPipelineDataLoad')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "tableNamesInArray",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "tableNamesArray",
+							"value": {
+								"value": "@split(pipeline().parameters.tableNames,',' )",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "tableNamesInArray",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@variables('tableNamesArray')",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "If Condition1",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "containername",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@equals(pipeline().parameters.loadType,'FullLoad' )",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Copy data1",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "DelimitedTextSource",
+														"storeSettings": {
+															"type": "AzureBlobStorageReadSettings",
+															"recursive": true,
+															"wildcardFileName": {
+																"value": "@concat(variables('tableNameInForLoop'),'*.csv')",
+																"type": "Expression"
+															},
+															"enablePartitionDiscovery": false
+														},
+														"formatSettings": {
+															"type": "DelimitedTextReadSettings"
+														}
+													},
+													"sink": {
+														"type": "AzureSqlSink",
+														"preCopyScript": {
+															"value": "TRuncate table @{concat(pipeline().parameters.schemaName,'.',variables('tableNameInForLoop'))\n}",
+															"type": "Expression"
+														},
+														"writeBehavior": "insert",
+														"sqlWriterUseTableLock": false
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "ds_dimHopsitalSource",
+														"type": "DatasetReference",
+														"parameters": {
+															"containerName": {
+																"value": "@pipeline().parameters.containerName",
+																"type": "Expression"
+															}
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "ds_sqlDatabase",
+														"type": "DatasetReference",
+														"parameters": {
+															"databasename": "sqlDatabaseLearnMentula",
+															"table_name": {
+																"value": "@variables('tableNameInForLoop')",
+																"type": "Expression"
+															},
+															"schemaName": {
+																"value": "@pipeline().parameters.schemaName",
+																"type": "Expression"
+															}
+														}
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": "Set variable1",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "tableNameInForLoop",
+										"value": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "containername",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Set variable1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "containerNameInForLoop",
+										"value": {
+											"value": "@pipeline().parameters.containerName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"schemaName": {
+						"type": "string",
+						"defaultValue": "hospitalTwo"
+					},
+					"containerName": {
+						"type": "string",
+						"defaultValue": "hospitaltwo"
+					},
+					"loadType": {
+						"type": "string",
+						"defaultValue": "FullLoad"
+					},
+					"tableNames": {
+						"type": "string",
+						"defaultValue": "departments,encounters,patients,transactions"
+					},
+					"LastUpdatevalue": {
+						"type": "string",
+						"defaultValue": "2026-03-21 07:49:31.253"
+					}
+				},
+				"variables": {
+					"tableNamesArray": {
+						"type": "Array"
+					},
+					"tableNameInForLoop": {
+						"type": "String"
+					},
+					"containerNameInForLoop": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2026-03-21T12:11:39Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_dimHopsitalSource')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sqlDatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_dataLoadDim')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_sqlDatabase",
+								"type": "DatasetReference",
+								"parameters": {
+									"databasename": "sqlDatabaseLearnMentula",
+									"table_name": "metadata",
+									"schemaName": "dbo"
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "loadType",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "loadType",
+										"value": {
+											"value": "@item().loadType",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "containerName",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "loadType",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "containerName",
+										"value": {
+											"value": "@item().containername",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "schemaName",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "containerName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "schemaName",
+										"value": {
+											"value": "@item().schemName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "table_names",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "schemaName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "tableName",
+										"value": {
+											"value": "@item().table_names",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "lastModified",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "table_names",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "lastUpdateValue",
+										"value": {
+											"value": "@item().lastUpdated",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Execute Pipeline1",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "lastModified",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pl_innderChildPipelineDataLoad",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"schemaName": {
+												"value": "@variables('schemaName')",
+												"type": "Expression"
+											},
+											"containerName": {
+												"value": "@variables('containerName')",
+												"type": "Expression"
+											},
+											"loadType": {
+												"value": "@variables('loadType')",
+												"type": "Expression"
+											},
+											"tableNames": {
+												"value": "@variables('tableName')",
+												"type": "Expression"
+											},
+											"LastUpdatevalue": {
+												"value": "@variables('lastUpdateValue')",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"schemaName": {
+						"type": "String"
+					},
+					"loadType": {
+						"type": "String"
+					},
+					"containerName": {
+						"type": "String"
+					},
+					"lastUpdateValue": {
+						"type": "String"
+					},
+					"tableName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2026-03-21T11:23:58Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_sqlDatabase')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_innderChildPipelineDataLoad')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tg_scheduledTrigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "/* This is a scheduled trigger and triggers on every day 9  AM  IST time frame */",
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_dataLoadDim",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2026-03-21T13:33:00",
+						"timeZone": "India Standard Time",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								9
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_dataLoadDim')]"
+			]
+		}
+	]
+}
