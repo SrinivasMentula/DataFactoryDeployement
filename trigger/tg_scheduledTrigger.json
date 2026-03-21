@@ -4,7 +4,14 @@
 		"description": "/* This is a scheduled trigger and triggers on every day 9  AM  IST time frame */",
 		"annotations": [],
 		"runtimeState": "Started",
-		"pipelines": [],
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_dataLoadDim",
+					"type": "PipelineReference"
+				}
+			}
+		],
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
