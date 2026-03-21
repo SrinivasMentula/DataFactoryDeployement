@@ -1,0 +1,26 @@
+{
+	"name": "tg_scheduledTrigger",
+	"properties": {
+		"description": "/* This is a scheduled trigger and triggers on every day 9  AM  IST time frame */",
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2026-03-21T13:33:00",
+				"timeZone": "India Standard Time",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						9
+					]
+				}
+			}
+		}
+	}
+}
