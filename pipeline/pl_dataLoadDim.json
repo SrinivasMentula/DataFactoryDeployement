@@ -52,7 +52,88 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "loadType",
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [
+								{
+									"activity": "If Condition1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_innderChildPipelineDataLoad",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"schemaName": {
+										"value": "@item().schemName",
+										"type": "Expression"
+									},
+									"containerName": {
+										"value": "@item().containername",
+										"type": "Expression"
+									},
+									"loadType": "@item().loadType",
+									"tableNames": {
+										"value": "@item().table_names",
+										"type": "Expression"
+									},
+									"LastUpdatevalue": {
+										"value": "@item().table_names",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Set variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(item().loadType,'FullLoad' )",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Execute Pipeline2",
+										"type": "ExecutePipeline",
+										"dependsOn": [],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "pl_TrunacteAndLoad",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true
+										}
+									}
+								]
+							}
+						},
+						{
+							"name": "shemaNames",
 							"type": "SetVariable",
 							"dependsOn": [],
 							"policy": {
@@ -61,9 +142,9 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "loadType",
+								"variableName": "schemaName",
 								"value": {
-									"value": "@item().loadType",
+									"value": "@item().schemaName",
 									"type": "Expression"
 								}
 							}
@@ -73,7 +154,7 @@
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "loadType",
+									"activity": "shemaNames",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -93,7 +174,7 @@
 							}
 						},
 						{
-							"name": "schemaName",
+							"name": "Set variable1",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
@@ -109,103 +190,10 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "schemaName",
-								"value": {
-									"value": "@item().schemName",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "table_names",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "schemaName",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
 								"variableName": "tableName",
 								"value": {
 									"value": "@item().table_names",
 									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "lastModified",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "table_names",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "lastUpdateValue",
-								"value": {
-									"value": "@item().lastUpdated",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Execute Pipeline1",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "lastModified",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "pl_innderChildPipelineDataLoad",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"schemaName": {
-										"value": "@variables('schemaName')",
-										"type": "Expression"
-									},
-									"containerName": {
-										"value": "@variables('containerName')",
-										"type": "Expression"
-									},
-									"loadType": {
-										"value": "@variables('loadType')",
-										"type": "Expression"
-									},
-									"tableNames": {
-										"value": "@variables('tableName')",
-										"type": "Expression"
-									},
-									"LastUpdatevalue": {
-										"value": "@variables('lastUpdateValue')",
-										"type": "Expression"
-									}
 								}
 							}
 						}

@@ -1,0 +1,116 @@
+{
+	"name": "pl_TrunacteAndLoad",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.tableNames",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 5,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"wildcardFileName": {
+											"value": "@concat(item(),'*.csv')",
+											"type": "Expression"
+										},
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "Truncate  table \n @{concat(pipeline().parameters.schemaName,'.',item())}",
+										"type": "Expression"
+									},
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_dimHopsitalSource",
+									"type": "DatasetReference",
+									"parameters": {
+										"containerName": {
+											"value": "@pipeline().parameters.containerName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_sqlDatabase",
+									"type": "DatasetReference",
+									"parameters": {
+										"databasename": "sqlDatabaseLearnMentula",
+										"table_name": {
+											"value": "@item()",
+											"type": "Expression"
+										},
+										"schemaName": {
+											"value": "@pipeline().parameters.schemaName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"tableNames": {
+				"type": "array",
+				"defaultValue": [
+					"departments",
+					"patients'"
+				]
+			},
+			"containerName": {
+				"type": "string"
+			},
+			"schemaName": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}

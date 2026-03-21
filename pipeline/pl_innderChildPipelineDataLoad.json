@@ -24,7 +24,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "tableNamesInArray",
+						"activity": "If Condition2",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -43,7 +43,7 @@
 							"type": "IfCondition",
 							"dependsOn": [
 								{
-									"activity": "containername",
+									"activity": "Set variable1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -152,29 +152,38 @@
 									"type": "Expression"
 								}
 							}
-						},
+						}
+					]
+				}
+			},
+			{
+				"name": "If Condition2",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "tableNamesInArray",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(pipeline().parameters.loadType,'FullLoad')",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
 						{
-							"name": "containername",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Set variable1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
 							"policy": {
-								"secureOutput": false,
 								"secureInput": false
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "containerNameInForLoop",
-								"value": {
-									"value": "@pipeline().parameters.containerName",
-									"type": "Expression"
-								}
+								"waitOnCompletion": true
 							}
 						}
 					]
