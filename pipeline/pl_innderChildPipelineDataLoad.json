@@ -172,21 +172,7 @@
 					"expression": {
 						"value": "@equals(pipeline().parameters.loadType,'FullLoad')",
 						"type": "Expression"
-					},
-					"ifTrueActivities": [
-						{
-							"name": "Execute Pipeline1",
-							"type": "ExecutePipeline",
-							"dependsOn": [],
-							"policy": {
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"waitOnCompletion": true
-							}
-						}
-					]
+					}
 				}
 			}
 		],
