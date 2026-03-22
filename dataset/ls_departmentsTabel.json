@@ -1,0 +1,33 @@
+{
+	"name": "ls_departmentsTabel",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azuresqldatbase",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"datbaseName": "sqlDatabaseLearnMentula"
+			}
+		},
+		"parameters": {
+			"schemaName": {
+				"type": "string"
+			},
+			"tableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().schemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().tableName",
+				"type": "Expression"
+			}
+		}
+	}
+}
