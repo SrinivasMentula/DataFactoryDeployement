@@ -241,7 +241,7 @@
 		"parameters": {
 			"containerName": {
 				"type": "string",
-				"defaultValue": "hospitalone"
+				"defaultValue": "hosiptalone"
 			}
 		},
 		"variables": {

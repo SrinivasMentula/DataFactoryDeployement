@@ -1,16 +1,25 @@
 {
-	"name": "ds_scheduledTriggeroutbound",
+	"name": "dsGetMetadata",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_storageAccount",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"containerName": {
+				"type": "string",
+				"defaultValue": "hospitalone"
+			}
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"container": "hosiptalone"
+				"container": {
+					"value": "@dataset().containerName",
+					"type": "Expression"
+				}
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

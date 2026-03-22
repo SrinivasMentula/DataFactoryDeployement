@@ -17,7 +17,13 @@
 				"typeProperties": {
 					"dataset": {
 						"referenceName": "hospital_one",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"conatinername": {
+								"value": "@pipeline().parameters.containername",
+								"type": "Expression"
+							}
+						}
 					},
 					"logStorageSettings": {
 						"linkedServiceName": {
@@ -30,12 +36,18 @@
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
 						"recursive": true,
-						"wildcardFileName": "*",
+						"wildcardFileName": "*.csv",
 						"enablePartitionDiscovery": false
 					}
 				}
 			}
 		],
+		"parameters": {
+			"containername": {
+				"type": "string",
+				"defaultValue": "hospitalone"
+			}
+		},
 		"annotations": []
 	}
 }

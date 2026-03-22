@@ -1,12 +1,12 @@
 {
-	"name": "hospital_one",
+	"name": "ds_deleteFiles",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_storageAccount",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"conatinername": {
+			"containerName": {
 				"type": "string",
 				"defaultValue": "hospitalone"
 			}
@@ -17,7 +17,7 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"container": {
-					"value": "@dataset().conatinername",
+					"value": "@dataset().containerName",
 					"type": "Expression"
 				}
 			}
