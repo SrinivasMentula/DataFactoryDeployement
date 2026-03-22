@@ -1,0 +1,22 @@
+{
+	"name": "ds_copyActivityLogs",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_storageAccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "deletelogs"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\"",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
