@@ -1,0 +1,32 @@
+{
+	"name": "ds_ControlFlag",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_storageAccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "controlFlag.csv",
+				"container": "controlfile"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "containername",
+				"type": "String"
+			},
+			{
+				"name": "wildCardExtention",
+				"type": "String"
+			}
+		]
+	}
+}
