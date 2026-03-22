@@ -3,7 +3,19 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_azuresqldatbase",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"databaseName": {
+					"value": "@dataset().databasename",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"databasename": {
+				"type": "string",
+				"defaultValue": "dbo"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",

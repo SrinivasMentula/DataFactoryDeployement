@@ -5,8 +5,6 @@
 			{
 				"name": "Copy data1",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -67,11 +65,11 @@
 						"referenceName": "pl_DepartmentData",
 						"type": "DatasetReference",
 						"parameters": {
-							"containerName": {
+							"containername": {
 								"value": "@pipeline().parameters.containerName",
 								"type": "Expression"
 							},
-							"fileName": {
+							"filename": {
 								"value": "@pipeline().parameters.fileName",
 								"type": "Expression"
 							}
@@ -102,8 +100,6 @@
 			{
 				"name": "If Condition1",
 				"type": "IfCondition",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Copy data1",
@@ -135,165 +131,92 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "Copy data2",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Set variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"wildcardFileName": "*",
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_copyActivityLogs",
+									"type": "DatasetReference",
+									"parameters": {
+										"directoryname": {
+											"value": "@variables('logFileName')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ls_azuresqldatabasee",
+									"type": "DatasetReference",
+									"parameters": {
+										"databasename": "sqlDatabaseLearnMentula"
+									}
+								}
+							]
 						}
 					]
 				}
-			},
-			{
-				"name": "Copy data2",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": ""
-								},
-								"sink": {
-									"name": "SNO",
-									"type": "Int64",
-									"physicalType": "bigint"
-								}
-							},
-							{
-								"source": {
-									"name": ""
-								},
-								"sink": {
-									"name": "datbaseName",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": ""
-								},
-								"sink": {
-									"name": "schemName",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": ""
-								},
-								"sink": {
-									"name": "containername",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": ""
-								},
-								"sink": {
-									"name": "table_names",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": ""
-								},
-								"sink": {
-									"name": "loadType",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": ""
-								},
-								"sink": {
-									"name": "lastUpdated",
-									"type": "DateTime",
-									"physicalType": "datetime"
-								}
-							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "pl_DepartmentData",
-						"type": "DatasetReference",
-						"parameters": {
-							"containerName": {
-								"value": "@pipeline().parameters.containerName",
-								"type": "Expression"
-							},
-							"fileName": "copyactivity-logs/Copy data1/03510ce6-fb00-450b-bdd1-f79bc9d0900a/b5e8fa98-aa9f-616f-257d-450af17ba4f1_0.txt"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ds_sqlDatabase",
-						"type": "DatasetReference",
-						"parameters": {
-							"databasename": "sqlDatabaseLearnMentula",
-							"table_name": {
-								"value": "@variables('tableName')",
-								"type": "Expression"
-							},
-							"schemaName": {
-								"value": "@variables('faultToleranceSchemaName')",
-								"type": "Expression"
-							}
-						}
-					}
-				]
 			}
 		],
 		"parameters": {
 			"containerName": {
 				"type": "string",
-				"defaultValue": "deletelogs"
+				"defaultValue": "hospitaltwo"
 			},
 			"schemaName": {
 				"type": "string",
-				"defaultValue": "dbo"
+				"defaultValue": "hospitalTwo"
 			},
 			"tableName": {
 				"type": "string",
-				"defaultValue": "logsTable"
+				"defaultValue": "departments"
 			},
 			"fileName": {
 				"type": "string",
