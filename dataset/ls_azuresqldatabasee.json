@@ -1,0 +1,39 @@
+{
+	"name": "ls_azuresqldatabasee",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azuresqldatbase",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Timestamp",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "Level",
+				"type": "varchar"
+			},
+			{
+				"name": "OperationName",
+				"type": "varchar"
+			},
+			{
+				"name": "OperationItem",
+				"type": "varchar"
+			},
+			{
+				"name": "Message",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "logsTable"
+		}
+	}
+}
