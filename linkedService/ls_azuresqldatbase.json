@@ -12,7 +12,7 @@
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
 			"server": "sqlserverlearndev.database.windows.net",
-			"database": "@{linkedService().datbaseName}",
+			"database": "@{linkedService().databaseName}",
 			"encrypt": "mandatory",
 			"trustServerCertificate": true,
 			"authenticationType": "SQL",
