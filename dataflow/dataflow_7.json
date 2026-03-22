@@ -50,7 +50,7 @@
 			],
 			"scriptLines": [
 				"parameters{",
-				"     pipelineRunsequentialNumber as integer (-1)",
+				"     pipelineRunsequentialNumber as string ('TestRun')",
 				"}",
 				"source(output(",
 				"          Period as date,",
