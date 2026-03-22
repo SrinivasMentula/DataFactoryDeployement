@@ -1,0 +1,22 @@
+{
+	"name": "ds_FileNames",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_storageAccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "hospitaltwo"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
