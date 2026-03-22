@@ -1,0 +1,44 @@
+{
+	"name": "ls_salesDataProcessed",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azuresqldatbase",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "period",
+				"type": "date"
+			},
+			{
+				"name": "product",
+				"type": "varchar"
+			},
+			{
+				"name": "currency",
+				"type": "varchar"
+			},
+			{
+				"name": "unitsSold",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "salesValueUSD",
+				"type": "decimal",
+				"precision": 34,
+				"scale": 2
+			},
+			{
+				"name": "RunSeqNo",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "salesdataProcesed"
+		}
+	}
+}
