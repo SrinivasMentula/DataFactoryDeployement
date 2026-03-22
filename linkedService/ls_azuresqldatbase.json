@@ -1,11 +1,13 @@
 {
 	"name": "ls_azuresqldatbase",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
 			"datbaseName": {
 				"type": "String",
 				"defaultValue": "sqlDatabaseLearnMentula"
+			},
+			"databaseName": {
+				"type": "String"
 			}
 		},
 		"annotations": [],
@@ -26,5 +28,6 @@
 				"secretName": "sqldatbasePassword"
 			}
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
