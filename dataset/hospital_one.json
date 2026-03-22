@@ -5,6 +5,12 @@
 			"referenceName": "ls_storageAccount",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"conatinername": {
+				"type": "string",
+				"defaultValue": "hospitalone"
+			}
+		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
