@@ -315,7 +315,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"container": "hosiptalone"
+						"container": "scheduledtriggeroutbound"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
