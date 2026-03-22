@@ -23,7 +23,7 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "pl_dataLoadDim",
+							"referenceName": "pl_TestPipeline",
 							"type": "PipelineReference"
 						},
 						"parameters": {}

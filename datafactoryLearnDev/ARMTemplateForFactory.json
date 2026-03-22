@@ -622,7 +622,8 @@
 							"sink": {
 								"type": "DelimitedTextSink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureBlobStorageWriteSettings",
+									"copyBehavior": "FlattenHierarchy"
 								},
 								"formatSettings": {
 									"type": "DelimitedTextWriteSettings",
@@ -1519,7 +1520,7 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "pl_dataLoadDim",
+							"referenceName": "pl_TestPipeline",
 							"type": "PipelineReference"
 						},
 						"parameters": {}
@@ -1544,7 +1545,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_dataLoadDim')]"
+				"[concat(variables('factoryId'), '/pipelines/pl_TestPipeline')]"
 			]
 		}
 	]
