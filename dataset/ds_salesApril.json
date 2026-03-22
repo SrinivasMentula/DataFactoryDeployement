@@ -1,0 +1,42 @@
+{
+	"name": "ds_salesApril",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_teststorageaccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "SALES",
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Sales Apr-Sep 2020.xlsx",
+				"container": "chapter7"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "Prop_0",
+				"type": "String"
+			},
+			{
+				"name": "Prop_1",
+				"type": "String"
+			},
+			{
+				"name": "Prop_2",
+				"type": "String"
+			},
+			{
+				"name": "Prop_3",
+				"type": "String"
+			},
+			{
+				"name": "Prop_4",
+				"type": "String"
+			}
+		]
+	}
+}

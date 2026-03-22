@@ -1,0 +1,71 @@
+{
+	"name": "dataflow_7",
+	"properties": {
+		"folder": {
+			"name": "chapter7"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_salesApril",
+						"type": "DatasetReference"
+					},
+					"name": "chapter7"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_teststorageaccount",
+						"type": "LinkedServiceReference"
+					},
+					"name": "inLineExchangerate"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "FfilteringProducts"
+				},
+				{
+					"name": "USDExchangeRates"
+				},
+				{
+					"name": "lookup1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Period as date,",
+				"          Product as string,",
+				"          {Unit Price} as double,",
+				"          Currency as string,",
+				"          {Units Sold} as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> chapter7",
+				"source(output(",
+				"          FromCurrency as string,",
+				"          ToCurrency as string,",
+				"          Date as date,",
+				"          ExchangeRate as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: true,",
+				"     format: 'excel',",
+				"     container: 'chapter7',",
+				"     fileName: 'ExchangeRates.xlsx',",
+				"     sheetName: 'Sheet1',",
+				"     firstRowAsHeader: true) ~> inLineExchangerate",
+				"chapter7 filter(Product != 'Month Total') ~> FfilteringProducts",
+				"inLineExchangerate filter(ToCurrency == 'USD') ~> USDExchangeRates",
+				"FfilteringProducts, USDExchangeRates lookup(Currency == FromCurrency",
+				"     && Period == Date,",
+				"     multiple: true,",
+				"     broadcast: 'auto')~> lookup1"
+			]
+		}
+	}
+}
