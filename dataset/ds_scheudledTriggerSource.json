@@ -1,0 +1,22 @@
+{
+	"name": "ds_scheudledTriggerSource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_storageAccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "hosiptalone"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
