@@ -3,7 +3,10 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_azuresqldatbase",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"databaseName": "sqlDatabaseLearnMentula"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
