@@ -2,10 +2,6 @@
 	"name": "ls_azuresqldatbase",
 	"properties": {
 		"parameters": {
-			"datbaseName": {
-				"type": "String",
-				"defaultValue": "sqlDatabaseLearnMentula"
-			},
 			"databaseName": {
 				"type": "String"
 			}
