@@ -9,6 +9,12 @@
 					"referenceName": "pl_eventBasedTrigger",
 					"type": "PipelineReference"
 				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "pl_dataLoadDim",
+					"type": "PipelineReference"
+				}
 			}
 		],
 		"type": "BlobEventsTrigger",
