@@ -35,6 +35,10 @@
 			"type": "string",
 			"defaultValue": "722d4b82-a332-4fbb-98dd-c2d9dca1b3c5"
 		},
+		"eventTriggerExample_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/09b1704d-52a6-4805-9f92-2f0b66b025e2/resourceGroups/rg-databrickslearn-mentula/providers/Microsoft.Storage/storageAccounts/learndatabricksazure"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -82,10 +86,33 @@
 					},
 					"ls_storageAccount_properties_typeProperties_servicePrincipalId": {
 						"value": "[parameters('ls_storageAccount_properties_typeProperties_servicePrincipalId')]"
+					},
+					"eventTriggerExample_properties_typeProperties_scope": {
+						"value": "[parameters('eventTriggerExample_properties_typeProperties_scope')]"
 					}
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "datafactoryLearnDev_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'datafactoryLearnDev_ArmTemplate_0')]"
+			]
 		}
 	]
 }

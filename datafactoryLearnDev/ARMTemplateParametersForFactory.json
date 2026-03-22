@@ -25,6 +25,9 @@
 		},
 		"ls_storageAccount_properties_typeProperties_servicePrincipalId": {
 			"value": "722d4b82-a332-4fbb-98dd-c2d9dca1b3c5"
+		},
+		"eventTriggerExample_properties_typeProperties_scope": {
+			"value": "/subscriptions/09b1704d-52a6-4805-9f92-2f0b66b025e2/resourceGroups/rg-databrickslearn-mentula/providers/Microsoft.Storage/storageAccounts/learndatabricksazure"
 		}
 	}
 }
