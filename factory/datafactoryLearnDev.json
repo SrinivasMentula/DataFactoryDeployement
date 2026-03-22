@@ -1,5 +1,13 @@
 {
 	"name": "datafactoryLearnDev",
+	"properties": {
+		"globalParameters": {
+			"env": {
+				"type": "string",
+				"value": "Dev"
+			}
+		}
+	},
 	"location": "eastus",
 	"identity": {
 		"type": "SystemAssigned",
