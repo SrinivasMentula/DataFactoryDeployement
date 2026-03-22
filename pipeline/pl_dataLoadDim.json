@@ -219,7 +219,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"containerName": {
-								"value": "@variables('containerName')",
+								"value": "@pipeline().parameters.containerName",
 								"type": "Expression"
 							}
 						}
@@ -238,6 +238,12 @@
 				}
 			}
 		],
+		"parameters": {
+			"containerName": {
+				"type": "string",
+				"defaultValue": "hospitalone"
+			}
+		},
 		"variables": {
 			"schemaName": {
 				"type": "String"
