@@ -17,7 +17,7 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/df_productMaintaince')]",
+			"name": "[concat(parameters('factoryName'), '/dataflow_7')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -29,54 +29,112 @@
 					"sources": [
 						{
 							"dataset": {
-								"referenceName": "ds_azureSQLDB",
+								"referenceName": "ds_salesApril",
 								"type": "DatasetReference"
 							},
-							"name": "source1"
+							"name": "chapter7"
+						},
+						{
+							"linkedService": {
+								"referenceName": "ls_teststorageaccount",
+								"type": "LinkedServiceReference"
+							},
+							"name": "inLineExchangerate"
 						}
 					],
 					"sinks": [
 						{
+							"dataset": {
+								"referenceName": "ls_salesDataProcessed",
+								"type": "DatasetReference"
+							},
 							"name": "sink1"
 						}
 					],
 					"transformations": [
 						{
-							"name": "separtingTheColumns"
-						}
-					],
-					"udfLibraries": [
+							"name": "FfilteringProducts"
+						},
 						{
-							"referenceName": "testFuncation",
-							"type": "DataFlowReference"
+							"name": "USDExchangeRates"
+						},
+						{
+							"name": "lookup1"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "select1"
 						}
 					],
 					"scriptLines": [
+						"parameters{",
+						"     pipelineRunsequentialNumber as string ('TestRun')",
+						"}",
 						"source(output(",
-						"          salesMonth as date,",
-						"          Retailer as string,",
+						"          Period as date,",
 						"          Product as string,",
-						"          SalesValueUSD as decimal(34,2),",
-						"          unitsSold as integer",
+						"          {Unit Price} as double,",
+						"          Currency as string,",
+						"          {Units Sold} as integer",
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> source1",
-						"source1 derive(weightString = :weighString,",
-						"          weightUnit = :WeightUnit,",
-						"          productName = :productName,",
-						"          LibraryFunctionTesting = AddingTwoValues(unitsSold,unitsSold),",
-						"          weighString := right(Product,(locate(' ', reverse(Product))-1) ),",
-						"          WeightUnit := iif(endsWith(Product,'oz'),'oz','g' ),",
-						"          productName := left(Product,(locate(' ', reverse(Product))-1))) ~> separtingTheColumns",
-						"separtingTheColumns sink(validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> chapter7",
+						"source(output(",
+						"          FromCurrency as string,",
+						"          ToCurrency as string,",
+						"          Date as date,",
+						"          ExchangeRate as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: true,",
+						"     format: 'excel',",
+						"     container: 'chapter7',",
+						"     fileName: 'ExchangeRates.xlsx',",
+						"     sheetName: 'Sheet1',",
+						"     firstRowAsHeader: true) ~> inLineExchangerate",
+						"chapter7 filter(Product != 'Month Total') ~> FfilteringProducts",
+						"inLineExchangerate filter(ToCurrency == 'USD') ~> USDExchangeRates",
+						"FfilteringProducts, USDExchangeRates lookup(Currency == FromCurrency",
+						"     && Period == Date,",
+						"     multiple: true,",
+						"     broadcast: 'auto')~> lookup1",
+						"lookup1 derive(SalesValueUSD = toDecimal({Unit Price}*{Units Sold}*ExchangeRate,34,2),",
+						"          RunSeqNo = $pipelineRunsequentialNumber,",
+						"          Retailer = 'Jolly Good Ltd') ~> derivedColumn1",
+						"derivedColumn1 select(mapColumn(",
+						"          SalesMonth = Period,",
+						"          Product,",
+						"          Currency,",
+						"          UnitsSold = {Units Sold},",
+						"          SalesValueUSD,",
+						"          Retailer,",
+						"          RunSeqNo",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     input(",
+						"          period as date,",
+						"          product as string,",
+						"          currency as string,",
+						"          unitsSold as integer,",
+						"          salesValueUSD as decimal(34,2),",
+						"          RunSeqNo as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     store: 'cache',",
-						"     format: 'inline',",
-						"     output: true,",
-						"     saveOrder: 1) ~> sink1"
+						"     saveOrder: 1,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 					]
 				}
 			},
@@ -214,6 +272,72 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/df_productMaintaince')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "chapter7"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_azureSQLDB",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "separtingTheColumns"
+						}
+					],
+					"udfLibraries": [
+						{
+							"referenceName": "testFuncation",
+							"type": "DataFlowReference"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          salesMonth as date,",
+						"          Retailer as string,",
+						"          Product as string,",
+						"          SalesValueUSD as decimal(34,2),",
+						"          unitsSold as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source1 derive(weightString = :weighString,",
+						"          weightUnit = :WeightUnit,",
+						"          productName = :productName,",
+						"          LibraryFunctionTesting = AddingTwoValues(unitsSold,unitsSold),",
+						"          weighString := right(Product,(locate(' ', reverse(Product))-1) ),",
+						"          WeightUnit := iif(endsWith(Product,'oz'),'oz','g' ),",
+						"          productName := left(Product,(locate(' ', reverse(Product))-1))) ~> separtingTheColumns",
+						"separtingTheColumns sink(validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     store: 'cache',",
+						"     format: 'inline',",
+						"     output: true,",
+						"     saveOrder: 1) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_datFlowTrigger')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -266,7 +390,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow_7')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_dataLoadDim')]",

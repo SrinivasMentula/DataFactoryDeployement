@@ -31,6 +31,9 @@
 		},
 		"eventTriggerExample_properties_typeProperties_scope": {
 			"value": "/subscriptions/09b1704d-52a6-4805-9f92-2f0b66b025e2/resourceGroups/rg-databrickslearn-mentula/providers/Microsoft.Storage/storageAccounts/learndatabricksazure"
+		},
+		"default_properties_env_value": {
+			"value": "Dev"
 		}
 	}
 }

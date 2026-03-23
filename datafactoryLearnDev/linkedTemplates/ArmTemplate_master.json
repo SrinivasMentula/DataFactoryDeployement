@@ -43,6 +43,10 @@
 			"type": "string",
 			"defaultValue": "/subscriptions/09b1704d-52a6-4805-9f92-2f0b66b025e2/resourceGroups/rg-databrickslearn-mentula/providers/Microsoft.Storage/storageAccounts/learndatabricksazure"
 		},
+		"default_properties_env_value": {
+			"type": "string",
+			"defaultValue": "Dev"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -72,6 +76,9 @@
 					},
 					"ls_teststorageaccount_connectionString": {
 						"value": "[parameters('ls_teststorageaccount_connectionString')]"
+					},
+					"default_properties_env_value": {
+						"value": "[parameters('default_properties_env_value')]"
 					},
 					"ls_keyvault_properties_typeProperties_baseUrl": {
 						"value": "[parameters('ls_keyvault_properties_typeProperties_baseUrl')]"
