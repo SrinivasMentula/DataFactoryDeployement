@@ -1,0 +1,15 @@
+{
+	"name": "testFuncation",
+	"properties": {
+		"description": "This function will be used to add to new integers",
+		"type": "UDFLibrary",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"AddingTwoValues(integer, integer) as integer = add(i1,i2)"
+			]
+		}
+	}
+}
