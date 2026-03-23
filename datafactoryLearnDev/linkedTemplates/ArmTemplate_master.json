@@ -7,13 +7,17 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactoryLearnDev"
 		},
+		"ls_teststorageaccount_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_teststorageaccount'"
+		},
 		"ls_azuresqldatbase_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "sqlserverlearndev.database.windows.net"
 		},
 		"ls_azuresqldatbase_properties_typeProperties_database": {
 			"type": "string",
-			"defaultValue": "@{linkedService().datbaseName}"
+			"defaultValue": "@{linkedService().databaseName}"
 		},
 		"ls_azuresqldatbase_properties_typeProperties_userName": {
 			"type": "string",
@@ -66,6 +70,9 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"ls_teststorageaccount_connectionString": {
+						"value": "[parameters('ls_teststorageaccount_connectionString')]"
+					},
 					"ls_keyvault_properties_typeProperties_baseUrl": {
 						"value": "[parameters('ls_keyvault_properties_typeProperties_baseUrl')]"
 					},
@@ -86,9 +93,6 @@
 					},
 					"ls_storageAccount_properties_typeProperties_servicePrincipalId": {
 						"value": "[parameters('ls_storageAccount_properties_typeProperties_servicePrincipalId')]"
-					},
-					"eventTriggerExample_properties_typeProperties_scope": {
-						"value": "[parameters('eventTriggerExample_properties_typeProperties_scope')]"
 					}
 				}
 			},
@@ -112,6 +116,29 @@
 			},
 			"dependsOn": [
 				"[resourceId('Microsoft.Resources/deployments', 'datafactoryLearnDev_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "datafactoryLearnDev_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"eventTriggerExample_properties_typeProperties_scope": {
+						"value": "[parameters('eventTriggerExample_properties_typeProperties_scope')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'datafactoryLearnDev_ArmTemplate_1')]"
 			]
 		}
 	]
