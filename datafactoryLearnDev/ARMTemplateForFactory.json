@@ -43,6 +43,14 @@
 			"type": "string",
 			"defaultValue": "/subscriptions/09b1704d-52a6-4805-9f92-2f0b66b025e2/resourceGroups/rg-databrickslearn-mentula/providers/Microsoft.Storage/storageAccounts/learndatabricksazure"
 		},
+		"demoTumblingWindowTriggger_properties_pipeline_parameters_windowStartTime": {
+			"type": "string",
+			"defaultValue": "@triggerOutputs().windowStartTime"
+		},
+		"demoTumblingWindowTriggger_properties_pipeline_parameters_windowEndTime": {
+			"type": "string",
+			"defaultValue": "@triggerOutputs().windowEndTime"
+		},
 		"default_properties_env_value": {
 			"type": "string",
 			"defaultValue": "Dev"
@@ -3161,6 +3169,149 @@
 			"apiVersion": "2018-06-01",
 			"properties": {},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/scheduledTrigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Week",
+						"interval": 2,
+						"startTime": "2026-03-23T11:54:00",
+						"endTime": "2026-03-24T11:54:00",
+						"timeZone": "India Standard Time",
+						"schedule": {
+							"minutes": [
+								10
+							],
+							"hours": [
+								10
+							],
+							"weekDays": [
+								"Monday",
+								"Wednesday",
+								"Friday"
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "windowStartTime",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "v_WindowStartTime",
+							"value": {
+								"value": "@pipeline().parameters.windowStartTime",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "windowEndTime",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "windowStartTime",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "v_WindowEndTime ",
+							"value": {
+								"value": "@pipeline().parameters.windowEndTime",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"windowStartTime": {
+						"type": "string"
+					},
+					"windowEndTime": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"v_WindowStartTime": {
+						"type": "String"
+					},
+					"v_WindowEndTime ": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "TumblingWindow"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/demoTumblingWindowTriggger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "pipeline1",
+						"type": "PipelineReference"
+					},
+					"parameters": {
+						"windowStartTime": "[parameters('demoTumblingWindowTriggger_properties_pipeline_parameters_windowStartTime')]",
+						"windowEndTime": "[parameters('demoTumblingWindowTriggger_properties_pipeline_parameters_windowEndTime')]"
+					}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Minute",
+					"interval": 20,
+					"startTime": "2026-03-23T12:26:00Z",
+					"endTime": "2026-03-24T12:26:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pipeline1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/default')]",

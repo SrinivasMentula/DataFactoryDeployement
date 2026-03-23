@@ -43,6 +43,14 @@
 			"type": "string",
 			"defaultValue": "/subscriptions/09b1704d-52a6-4805-9f92-2f0b66b025e2/resourceGroups/rg-databrickslearn-mentula/providers/Microsoft.Storage/storageAccounts/learndatabricksazure"
 		},
+		"demoTumblingWindowTriggger_properties_pipeline_parameters_windowStartTime": {
+			"type": "string",
+			"defaultValue": "@triggerOutputs().windowStartTime"
+		},
+		"demoTumblingWindowTriggger_properties_pipeline_parameters_windowEndTime": {
+			"type": "string",
+			"defaultValue": "@triggerOutputs().windowEndTime"
+		},
 		"default_properties_env_value": {
 			"type": "string",
 			"defaultValue": "Dev"
@@ -100,6 +108,12 @@
 					},
 					"ls_storageAccount_properties_typeProperties_servicePrincipalId": {
 						"value": "[parameters('ls_storageAccount_properties_typeProperties_servicePrincipalId')]"
+					},
+					"demoTumblingWindowTriggger_properties_pipeline_parameters_windowStartTime": {
+						"value": "[parameters('demoTumblingWindowTriggger_properties_pipeline_parameters_windowStartTime')]"
+					},
+					"demoTumblingWindowTriggger_properties_pipeline_parameters_windowEndTime": {
+						"value": "[parameters('demoTumblingWindowTriggger_properties_pipeline_parameters_windowEndTime')]"
 					}
 				}
 			},
