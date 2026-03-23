@@ -39,10 +39,6 @@
 			"type": "string",
 			"defaultValue": "722d4b82-a332-4fbb-98dd-c2d9dca1b3c5"
 		},
-		"eventTriggerExample_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/09b1704d-52a6-4805-9f92-2f0b66b025e2/resourceGroups/rg-databrickslearn-mentula/providers/Microsoft.Storage/storageAccounts/learndatabricksazure"
-		},
 		"demoTumblingWindowTriggger_properties_pipeline_parameters_windowStartTime": {
 			"type": "string",
 			"defaultValue": "@triggerOutputs().windowStartTime"
@@ -50,6 +46,10 @@
 		"demoTumblingWindowTriggger_properties_pipeline_parameters_windowEndTime": {
 			"type": "string",
 			"defaultValue": "@triggerOutputs().windowEndTime"
+		},
+		"eventTriggerExample_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/09b1704d-52a6-4805-9f92-2f0b66b025e2/resourceGroups/rg-databrickslearn-mentula/providers/Microsoft.Storage/storageAccounts/learndatabricksazure"
 		},
 		"default_properties_env_value": {
 			"type": "string",

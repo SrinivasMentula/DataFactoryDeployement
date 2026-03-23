@@ -69,6 +69,80 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "windowStartTime",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "startTime",
+							"value": {
+								"value": "@pipeline().parameters.windowStartTime",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "windowEndTime",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "windowStartTime",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "endTime",
+							"value": {
+								"value": "@pipeline().parameters.windowEndTime",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"windowStartTime": {
+						"type": "string"
+					},
+					"windowEndTime": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"startTime": {
+						"type": "String"
+					},
+					"endTime": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "TumblingWindow"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_childReturnVariable')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -205,6 +279,40 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/scheduledTrigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Week",
+						"interval": 2,
+						"startTime": "2026-03-23T11:54:00",
+						"endTime": "2026-03-24T11:54:00",
+						"timeZone": "India Standard Time",
+						"schedule": {
+							"minutes": [
+								10
+							],
+							"hours": [
+								10
+							],
+							"weekDays": [
+								"Monday",
+								"Wednesday",
+								"Friday"
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/azureManagedIR')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
@@ -248,114 +356,6 @@
 			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
 			"apiVersion": "2018-06-01",
 			"properties": {},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/scheduledTrigger')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Week",
-						"interval": 2,
-						"startTime": "2026-03-23T11:54:00",
-						"endTime": "2026-03-24T11:54:00",
-						"timeZone": "India Standard Time",
-						"schedule": {
-							"minutes": [
-								10
-							],
-							"hours": [
-								10
-							],
-							"weekDays": [
-								"Monday",
-								"Wednesday",
-								"Friday"
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "windowStartTime",
-						"type": "SetVariable",
-						"dependsOn": [],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "v_WindowStartTime",
-							"value": {
-								"value": "@pipeline().parameters.windowStartTime",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "windowEndTime",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "windowStartTime",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "v_WindowEndTime ",
-							"value": {
-								"value": "@pipeline().parameters.windowEndTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"windowStartTime": {
-						"type": "string"
-					},
-					"windowEndTime": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"v_WindowStartTime": {
-						"type": "String"
-					},
-					"v_WindowEndTime ": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "TumblingWindow"
-				},
-				"annotations": []
-			},
 			"dependsOn": []
 		},
 		{
@@ -556,38 +556,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "Managed",
-				"typeProperties": {
-					"computeProperties": {
-						"location": "East US",
-						"dataFlowProperties": {
-							"computeType": "General",
-							"coreCount": 8,
-							"timeToLive": 10,
-							"cleanup": false,
-							"customProperties": []
-						},
-						"pipelineExternalComputeScaleProperties": {
-							"timeToLive": 60,
-							"numberOfPipelineNodes": 1,
-							"numberOfExternalNodes": 1
-						}
-					}
-				},
-				"managedVirtualNetwork": {
-					"type": "ManagedVirtualNetworkReference",
-					"referenceName": "default"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/demoTumblingWindowTriggger')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -620,6 +588,38 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/pipeline1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "East US",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						},
+						"pipelineExternalComputeScaleProperties": {
+							"timeToLive": 60,
+							"numberOfPipelineNodes": 1,
+							"numberOfExternalNodes": 1
+						}
+					}
+				},
+				"managedVirtualNetwork": {
+					"type": "ManagedVirtualNetworkReference",
+					"referenceName": "default"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
 			]
 		},
 		{
