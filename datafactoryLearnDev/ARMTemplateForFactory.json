@@ -39,17 +39,17 @@
 			"type": "string",
 			"defaultValue": "722d4b82-a332-4fbb-98dd-c2d9dca1b3c5"
 		},
-		"demoTumblingWindowTriggger_properties_pipeline_parameters_windowStartTime": {
-			"type": "string",
-			"defaultValue": "@triggerOutputs().windowStartTime"
-		},
-		"demoTumblingWindowTriggger_properties_pipeline_parameters_windowEndTime": {
-			"type": "string",
-			"defaultValue": "@triggerOutputs().windowEndTime"
-		},
 		"eventTriggerExample_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/09b1704d-52a6-4805-9f92-2f0b66b025e2/resourceGroups/rg-databrickslearn-mentula/providers/Microsoft.Storage/storageAccounts/learndatabricksazure"
+		},
+		"tumblingWindowExample_properties_pipeline_parameters_windowStartTime": {
+			"type": "string",
+			"defaultValue": "@triggerOutputs().windowStartTime"
+		},
+		"tumblingWindowExample_properties_pipeline_parameters_windowEndTime": {
+			"type": "string",
+			"defaultValue": "@triggerOutputs().windowEndTime"
 		},
 		"default_properties_env_value": {
 			"type": "string",
@@ -113,10 +113,12 @@
 				},
 				"parameters": {
 					"windowStartTime": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "This is a  testing value "
 					},
 					"windowEndTime": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "This is a testing value 2"
 					}
 				},
 				"variables": {
@@ -2765,41 +2767,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/demoTumblingWindowTriggger')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipeline": {
-					"pipelineReference": {
-						"referenceName": "pipeline1",
-						"type": "PipelineReference"
-					},
-					"parameters": {
-						"windowStartTime": "[parameters('demoTumblingWindowTriggger_properties_pipeline_parameters_windowStartTime')]",
-						"windowEndTime": "[parameters('demoTumblingWindowTriggger_properties_pipeline_parameters_windowEndTime')]"
-					}
-				},
-				"type": "TumblingWindowTrigger",
-				"typeProperties": {
-					"frequency": "Minute",
-					"interval": 20,
-					"startTime": "2026-03-23T12:26:00Z",
-					"endTime": "2026-03-23T13:26:00Z",
-					"delay": "00:00:00",
-					"maxConcurrency": 50,
-					"retryPolicy": {
-						"intervalInSeconds": 30
-					},
-					"dependsOn": []
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pipeline1')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/eventTriggerExample')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -3312,6 +3279,41 @@
 			"apiVersion": "2018-06-01",
 			"properties": {},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tumblingWindowExample')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "pipeline1",
+						"type": "PipelineReference"
+					},
+					"parameters": {
+						"windowStartTime": "[parameters('tumblingWindowExample_properties_pipeline_parameters_windowStartTime')]",
+						"windowEndTime": "[parameters('tumblingWindowExample_properties_pipeline_parameters_windowEndTime')]"
+					}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Minute",
+					"interval": 5,
+					"startTime": "2026-03-23T14:13:00Z",
+					"endTime": "2026-03-24T14:24:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pipeline1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/default')]",
