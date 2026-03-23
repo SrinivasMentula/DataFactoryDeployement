@@ -5,7 +5,15 @@
 			"referenceName": "ls_azuresqldatbase",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"databaseName": "sqlDatabaseLearnMentula"
+				"databaseName": {
+					"value": "@dataset().databaseName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"databaseName": {
+				"type": "string"
 			}
 		},
 		"annotations": [],

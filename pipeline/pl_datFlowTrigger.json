@@ -23,6 +23,11 @@
 								"value": "'@{pipeline().Pipeline}'",
 								"type": "Expression"
 							}
+						},
+						"datasetParameters": {
+							"sink1": {
+								"databaseName": "sqlDatabaseLearnMentula"
+							}
 						}
 					},
 					"compute": {
