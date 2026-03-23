@@ -46,10 +46,12 @@
 		],
 		"parameters": {
 			"windowStartTime": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "This is a  testing value "
 			},
 			"windowEndTime": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "This is a testing value 2"
 			}
 		},
 		"variables": {
