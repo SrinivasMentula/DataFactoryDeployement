@@ -1,0 +1,63 @@
+{
+	"name": "df_productMaintaince",
+	"properties": {
+		"folder": {
+			"name": "chapter7"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_azureSQLDB",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "separtingTheColumns"
+				}
+			],
+			"udfLibraries": [
+				{
+					"referenceName": "testFuncation",
+					"type": "DataFlowReference"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          salesMonth as date,",
+				"          Retailer as string,",
+				"          Product as string,",
+				"          SalesValueUSD as decimal(34,2),",
+				"          unitsSold as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 derive(weightString = :weighString,",
+				"          weightUnit = :WeightUnit,",
+				"          productName = :productName,",
+				"          LibraryFunctionTesting = AddingTwoValues(unitsSold,unitsSold),",
+				"          weighString := right(Product,(locate(' ', reverse(Product))-1) ),",
+				"          WeightUnit := iif(endsWith(Product,'oz'),'oz','g' ),",
+				"          productName := left(Product,(locate(' ', reverse(Product))-1))) ~> separtingTheColumns",
+				"separtingTheColumns sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: true,",
+				"     saveOrder: 1) ~> sink1"
+			]
+		}
+	}
+}
