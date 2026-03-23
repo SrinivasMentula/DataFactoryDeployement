@@ -1,0 +1,31 @@
+{
+	"name": "scheduledTrigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Week",
+				"interval": 2,
+				"startTime": "2026-03-23T11:54:00",
+				"endTime": "2026-03-24T11:54:00",
+				"timeZone": "India Standard Time",
+				"schedule": {
+					"minutes": [
+						10
+					],
+					"hours": [
+						10
+					],
+					"weekDays": [
+						"Monday",
+						"Wednesday",
+						"Friday"
+					]
+				}
+			}
+		}
+	}
+}
