@@ -1,0 +1,58 @@
+{
+	"name": "ds_DynamicMapping",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_teststorageaccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "dynamicMapping.json",
+				"folderPath": "dynamicMapping",
+				"container": "salesdata"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"source": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"type": {
+							"type": "string"
+						},
+						"physicalType": {
+							"type": "string"
+						}
+					}
+				},
+				"sink": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"type": {
+							"type": "string"
+						},
+						"physicalType": {
+							"type": "string"
+						},
+						"scale": {
+							"type": "integer"
+						},
+						"precision": {
+							"type": "integer"
+						}
+					}
+				}
+			}
+		}
+	}
+}
