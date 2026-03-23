@@ -1,0 +1,61 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "windowStartTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_WindowStartTime",
+					"value": {
+						"value": "@pipeline().parameters.windowStartTime",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "windowEndTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "windowStartTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			}
+		],
+		"parameters": {
+			"windowStartTime": {
+				"type": "string"
+			},
+			"windowEndTime": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"v_WindowStartTime": {
+				"type": "String"
+			},
+			"v_WindowEndTime ": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "TumblingWindow"
+		},
+		"annotations": []
+	}
+}
