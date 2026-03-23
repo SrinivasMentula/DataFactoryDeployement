@@ -34,7 +34,14 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_WindowEndTime ",
+					"value": {
+						"value": "@pipeline().parameters.windowEndTime",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
