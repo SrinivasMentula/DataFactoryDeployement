@@ -4,7 +4,7 @@
 		"type": "Managed",
 		"typeProperties": {
 			"computeProperties": {
-				"location": "AutoResolve",
+				"location": "Austria East",
 				"dataFlowProperties": {
 					"computeType": "General",
 					"coreCount": 8,
