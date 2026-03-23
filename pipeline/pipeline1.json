@@ -12,7 +12,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "v_WindowStartTime",
+					"variableName": "startTime",
 					"value": {
 						"value": "@pipeline().parameters.windowStartTime",
 						"type": "Expression"
@@ -36,7 +36,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "v_WindowEndTime",
+					"variableName": "endTime",
 					"value": {
 						"value": "@pipeline().parameters.windowEndTime",
 						"type": "Expression"
@@ -53,10 +53,10 @@
 			}
 		},
 		"variables": {
-			"v_WindowStartTime": {
+			"startTime": {
 				"type": "String"
 			},
-			"v_WindowEndTime": {
+			"endTime": {
 				"type": "String"
 			}
 		},
