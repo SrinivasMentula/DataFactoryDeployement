@@ -1,0 +1,99 @@
+{
+	"name": "ds_jsonSampleData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_teststorageaccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "sample_json.json",
+				"container": "salesdata"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"order_id": {
+					"type": "integer"
+				},
+				"order_timestamp": {
+					"type": "string"
+				},
+				"customer": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "integer"
+						},
+						"name": {
+							"type": "string"
+						},
+						"location": {
+							"type": "object",
+							"properties": {
+								"city": {
+									"type": "string"
+								},
+								"pincode": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"items": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"item_id": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							},
+							"category": {
+								"type": "string"
+							},
+							"price": {
+								"type": "integer"
+							},
+							"quantity": {
+								"type": "integer"
+							}
+						}
+					}
+				},
+				"payment": {
+					"type": "object",
+					"properties": {
+						"method": {
+							"type": "string"
+						},
+						"amount": {
+							"type": "integer"
+						},
+						"status": {
+							"type": "string"
+						}
+					}
+				},
+				"delivery": {
+					"type": "object",
+					"properties": {
+						"status": {
+							"type": "string"
+						},
+						"delivered_on": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,65 @@
+{
+	"name": "jsonDataHandling",
+	"properties": {
+		"folder": {
+			"name": "JsondataHandling"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_jsonSampleData",
+						"type": "DatasetReference"
+					},
+					"name": "sampleJsonData"
+				}
+			],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          customer as (id as short, location as (city as string, pincode as integer), name as string),",
+				"          delivery as (delivered_on as date, status as string),",
+				"          items as (category as string, item_id as string, name as string, price as integer, quantity as short)[],",
+				"          order_id as short,",
+				"          order_timestamp as timestamp,",
+				"          payment as (amount as integer, method as string, status as string)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> sampleJsonData",
+				"sampleJsonData foldDown(unroll(items),",
+				"     mapColumn(",
+				"          category = items.category,",
+				"          item_id = items.item_id,",
+				"          name = items.name,",
+				"          price = items.price,",
+				"          quantity = items.quantity,",
+				"          customer,",
+				"          delivery = delivery,",
+				"          payment = payment,",
+				"          items = items",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> flatten1",
+				"flatten1 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: true,",
+				"     saveOrder: 1) ~> sink1"
+			]
+		}
+	}
+}
