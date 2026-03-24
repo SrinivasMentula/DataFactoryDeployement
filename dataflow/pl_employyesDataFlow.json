@@ -15,10 +15,10 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ds_EmployeesPartionedData",
+						"referenceName": "ds_employes",
 						"type": "DatasetReference"
 					},
-					"name": "source"
+					"name": "sink1"
 				}
 			],
 			"transformations": [
@@ -44,16 +44,12 @@
 				"          0,",
 				"          Team",
 				"     )) ~> employeesDataSource",
-				"employeesDataSource aggregate(groupBy({Senior Management}),",
-				"     Salary = sum(Salary),",
-				"     partitionBy('key',",
-				"          0,",
-				"          {Senior Management}",
-				"     )) ~> aggregate1",
+				"employeesDataSource aggregate(groupBy(Team),",
+				"     Salary = sum(Salary)) ~> aggregate1",
 				"aggregate1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> source"
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
