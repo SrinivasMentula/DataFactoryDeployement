@@ -1,5 +1,5 @@
 {
-	"name": "ds_employes",
+	"name": "ds_PartionedDiscovery",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_teststorageaccount",
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "psrtionedSecondary",
+				"folderPath": "discoveryOutbound",
 				"container": "salesdata"
 			},
 			"columnDelimiter": ",",
