@@ -1,0 +1,23 @@
+{
+	"name": "ds_partionedDataOutbound",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_teststorageaccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "partionedDataOutbound",
+				"container": "salesdata"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
