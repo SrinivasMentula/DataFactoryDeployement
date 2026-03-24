@@ -1,0 +1,23 @@
+{
+	"name": "ds_EmployeesPartionedData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_teststorageaccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "partioned",
+				"container": "employeesdata"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

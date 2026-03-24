@@ -12,15 +12,48 @@
 					"name": "employeesDataSource"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_EmployeesPartionedData",
+						"type": "DatasetReference"
+					},
+					"name": "source"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
-				"          POnumber as string",
+				"          {First Name} as string,",
+				"          Gender as string,",
+				"          {Start Date} as date,",
+				"          {Last Login Time} as string,",
+				"          Salary as integer,",
+				"          {Bonus %} as double,",
+				"          {Senior Management} as boolean,",
+				"          Team as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> employeesDataSource"
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('key',",
+				"          0,",
+				"          Team",
+				"     )) ~> employeesDataSource",
+				"employeesDataSource aggregate(groupBy({Senior Management}),",
+				"     Salary = sum(Salary),",
+				"     partitionBy('key',",
+				"          0,",
+				"          {Senior Management}",
+				"     )) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> source"
 			]
 		}
 	}
