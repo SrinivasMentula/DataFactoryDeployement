@@ -1,0 +1,26 @@
+{
+	"name": "ds_SalesDataOutbound",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_teststorageaccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@concat('dbo.salesData_staring',\nformatDateTime(adddays(startOfMonth(utcNow()),-1),'ddMMMyyyy'),'_Ending_',formatDateTime(utcNow(),'ddMMMyyyy')\n)",
+					"type": "Expression"
+				},
+				"container": "salesdata"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
