@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": {
-					"value": "@concat('dbo.salesData_staring',\nformatDateTime(adddays(startOfMonth(utcNow()),-1),'ddMMMyyyy'),'_Ending_',formatDateTime(utcNow(),'ddMMMyyyy')\n)",
+					"value": "@concat('dbo.salesData_staring',\nformatDateTime(adddays(startOfMonth(utcNow()),-1),'ddMMMyyyy'),'_Ending_',formatDateTime(utcNow(),'ddMMMyyyy'),'.csv'\n)",
 					"type": "Expression"
 				},
 				"container": "salesdata"
